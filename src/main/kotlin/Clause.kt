@@ -6,9 +6,22 @@ class Clause(array: MutableList<Int>, val parent1: Clause? = null, val parent2: 
 
     init {
         varArray.sortBy { abs(it) }
+        simplify()
     }
 
-    fun canBeResoluted(clause: Clause): Boolean {
+    fun isEmpty(): Boolean {
+        return length == 0
+    }
+
+    fun isLiteral(): Boolean {
+        return length == 1
+    }
+
+    fun copy() : Clause {
+        return Clause(varArray.toMutableList())
+    }
+
+    fun canBeResolute(clause: Clause): Boolean {
         for (el in varArray) {
             if (-el in clause.varArray)
                 return true
