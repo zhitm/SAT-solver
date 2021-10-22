@@ -19,9 +19,7 @@ class HelloJunit5Test {
         solver.interpretString("p cnf 1 1")
         solver.interpretString("1 0")
         solver.solve()
-        for (el in solver.formula.variables) println(el)
-        println()
-        assertEquals(true, solver.formula.isSolved)
+             assertEquals(true, solver.formula.isSolved)
         assertEquals(true, solver.isAnswerCorrect())
     }
     @Test
@@ -94,14 +92,64 @@ class HelloJunit5Test {
         solver.solve()
         assertEquals(false, solver.formula.canBeSolved)
     }
-//    @Test
-//    fun `test 238`() {
-//        val solver = Solver()
-//        solver.interpretString("p cnf 2 1")
-//        solver.interpretString("-1 -2 0")
-//        solver.solve()
-//        assertEquals(true, solver.formula.isSolved)
-//    }
+    @Test
+    fun `test 10`() {
+        val solver = Solver()
+        solver.interpretString("p cnf 3 6")
+        solver.interpretString("1 -2 0")
+        solver.interpretString("-1 2 0")
+        solver.interpretString("2 -3 0")
+        solver.interpretString("3 -2 0")
+        solver.interpretString("1 3 0")
+        solver.interpretString("-1 -3 0")
+        solver.interpretString("1 -3 0")
+        solver.solve()
+        assertEquals(false, solver.formula.canBeSolved)
+    }
+
+    @Test
+    fun `test 11`() {
+        val solver = Solver()
+        solver.interpretString("p cnf 4 4")
+        solver.interpretString("1 2 3 0")
+        solver.interpretString("-1 -2 0")
+        solver.interpretString("3 4 0")
+        solver.interpretString("1 -2 0")
+        solver.solve()
+        assertEquals(true, solver.formula.isSolved)
+        assertEquals(true, solver.isAnswerCorrect())
+    }
+
+    @Test
+    fun `test 12`() {
+        val solver = Solver()
+        solver.interpretString("p cnf 4 1")
+        solver.interpretString("1 2 3 4 0")
+        solver.solve()
+        assertEquals(true, solver.formula.isSolved)
+        assertEquals(true, solver.isAnswerCorrect())
+    }
+
+    @Test
+    fun `test 13`() {
+        val solver = Solver()
+        solver.interpretString("p cnf 4 3")
+        solver.interpretString("1 2 0")
+        solver.interpretString("2 3 0")
+        solver.interpretString("-3 -4 0")
+        solver.solve()
+        assertEquals(true, solver.formula.isSolved)
+        assertEquals(true, solver.isAnswerCorrect())
+    }
+
+    @Test
+    fun `test 238`() {
+        val solver = Solver()
+        solver.interpretString("p cnf 2 1")
+        solver.interpretString("-1 -2 0")
+        solver.solve()
+        assertEquals(true, solver.formula.isSolved)
+    }
 //    - тест перебора вариантов, которого нет пока
 }
 

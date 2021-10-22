@@ -99,12 +99,29 @@ class BooleanFormula() {
         return true
     }
 
+    fun copy(): BooleanFormula {
+        val newFormula = BooleanFormula()
+        newFormula.variables = variables
+        newFormula.clauseCnt = clauseCnt
+        newFormula.clauses = clauses
+        newFormula.startClauses = startClauses
+        newFormula.unknownVariablesLeft = unknownVariablesLeft
+        newFormula.varCnt = varCnt
+        return newFormula
+    }
+
+
+    fun setVariable(variable: Int, value: Boolean) {
+        deleteAllUsesOfVariable(variable, value, clauses)
+    }
+
+
     fun deleteAllUsesOfVariable(variable: Int, value: Boolean, list: MutableList<Clause>) {
         if (variables[variable - 1] == null) {
             unknownVariablesLeft--
             variables[variable - 1] = value
         }
-        val valueOfVariable : Boolean = variables[variable-1] == true
+        val valueOfVariable: Boolean = variables[variable - 1] == true
         when (list) {
             clauses -> clauses =
                 list.filter { deleteClauseOrDeleteVariable(variable, valueOfVariable, it, list) } as MutableList<Clause>

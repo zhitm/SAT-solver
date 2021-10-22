@@ -20,7 +20,6 @@ class Solver {
             println("No solution!")
             createGraph(formula.emptyClause)
         } else {
-            println(formula.isSolved)
             for (i in formula.variables.indices) {
                 if (formula.variables[i] != null)
                     println((i+1).toString() + ": " + formula.variables[i])
@@ -99,9 +98,14 @@ class Solver {
             return
         }
         if (!formula.canBeSolved) return
-        for (el in formula.variables) {
-            if (el == null) {
-//                TODO("все")
+        for (i in formula.variables.indices) {
+            if (formula.variables[i] == null) {
+                val formulaWithTrueValue: BooleanFormula = formula.copy()
+                val formulaWithFalseValue: BooleanFormula = formula.copy()
+                formulaWithTrueValue.setVariable(i+1, true)
+                formulaWithFalseValue.setVariable(i+1, false)
+                bruteForce(formulaWithTrueValue)
+                bruteForce(formulaWithFalseValue)
             }
         }
     }
