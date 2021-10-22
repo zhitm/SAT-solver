@@ -17,11 +17,22 @@ class Clause(array: MutableList<Int>, val parent1: Clause? = null, val parent2: 
         return length == 1
     }
 
-    fun copy() : Clause {
+    fun copy(): Clause {
         return Clause(varArray.toMutableList())
     }
 
     fun canBeResolute(clause: Clause): Boolean {
+        if (clause.length == length && length > 1) {
+//            полностью противоположные клозы не резолируются
+            var areOpposite = true
+            for (i in varArray.indices) {
+                if (clause.varArray[i] != -varArray[i]) {
+                    areOpposite = false
+                    break
+                }
+                if (areOpposite) return false
+            }
+        }
         for (el in varArray) {
             if (-el in clause.varArray)
                 return true

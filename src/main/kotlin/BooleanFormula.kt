@@ -24,19 +24,35 @@ class BooleanFormula() {
         return (clauses.isEmpty() && lastLevel.isEmpty() && newLastLevel.isEmpty())
     }
 
-    fun addClause(clause: Clause) {
+    fun addClauseFromFile(clause: Clause) {
+        for (literal in clause.varArray) {
+            if (literal > 0 && (variables[literal - 1] == true)|| (literal < 0 && variables[-literal - 1] == false )) return
+        }
+        for (i in variables.indices){
+            if (variables[i]!=null) {
+                if ((i+1) in clause.varArray && variables[i]==false) clause.varArray.remove(i+1)
+                if ((-i-1) in clause.varArray && variables[i]==true) clause.varArray.remove(-i-1)
+            }
+        }
+        clause.length = clause.varArray.size
         if (clause.length == 0) {
             canBeSolved = false
             emptyClause = clause
-        } else {
-            if (!hasClause(clause)) {
-                clauses.add(clause)
-                clauseCnt++
-                if (clause.length == 1) {
-                    val literal: Int = clause.varArray[0]
-                    deleteAllUsesOfVariable(abs(literal), literal > 0, clauses)
-                }
-            }
+            return
+        }
+        addClause(clause)
+        if (clause.length == 1) {
+            val literal: Int = clause.varArray[0]
+            deleteAllUsesOfVariable(abs(literal), literal > 0, clauses)
+        }
+//        printState()
+
+    }
+
+    fun addClause(clause: Clause) {
+        if (!hasClause(clause)) {
+            clauses.add(clause)
+            clauseCnt++
         }
     }
 
@@ -48,9 +64,9 @@ class BooleanFormula() {
     }
 
     fun printState() {
-//        println(".....")
-//        for (el in startClauses) print(el.varArray)
-//        println()
+        println(".....")
+        for (el in startClauses) print(el.varArray)
+        println()
         for (el in clauses) print(el.varArray)
         println()
         for (el in lastLevel) print(el.varArray)
@@ -74,6 +90,7 @@ class BooleanFormula() {
                 clause.varArray.remove(variable)
                 clause.length--
                 if (clause.isEmpty()) {
+                    emptyClause = clause
                     if (list == clauses)
                         clauseCnt--
                     canBeSolved = false
@@ -85,6 +102,7 @@ class BooleanFormula() {
                 clause.varArray.remove(-variable)
                 clause.length--
                 if (clause.isEmpty()) {
+                    emptyClause = clause
                     if (list == clauses)
                         clauseCnt--
                     canBeSolved = false
@@ -110,11 +128,9 @@ class BooleanFormula() {
         return newFormula
     }
 
-
     fun setVariable(variable: Int, value: Boolean) {
         deleteAllUsesOfVariable(variable, value, clauses)
     }
-
 
     fun deleteAllUsesOfVariable(variable: Int, value: Boolean, list: MutableList<Clause>) {
         if (variables[variable - 1] == null) {
@@ -126,9 +142,9 @@ class BooleanFormula() {
             clauses -> clauses =
                 list.filter { deleteClauseOrDeleteVariable(variable, valueOfVariable, it, list) } as MutableList<Clause>
             lastLevel -> lastLevel =
-                list.filter { deleteClauseOrDeleteVariable(variable, value, it, list) } as MutableList<Clause>
+                list.filter { deleteClauseOrDeleteVariable(variable, valueOfVariable, it, list) } as MutableList<Clause>
             newLastLevel -> newLastLevel =
-                list.filter { deleteClauseOrDeleteVariable(variable, value, it, list) } as MutableList<Clause>
+                list.filter { deleteClauseOrDeleteVariable(variable, valueOfVariable, it, list) } as MutableList<Clause>
         }
         for (clause in list) {
             if (!canBeSolved) return

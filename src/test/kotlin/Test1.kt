@@ -37,7 +37,8 @@ class HelloJunit5Test {
         solver.interpretString("1 2 0")
         solver.interpretString("-1 -2 0")
         solver.solve()
-        assertEquals(false, solver.formula.canBeSolved)
+        assertEquals(true, solver.formula.canBeSolved)
+        assertEquals(true, solver.isAnswerCorrect())
     }
     @Test
     fun `test 5`() {
@@ -46,9 +47,10 @@ class HelloJunit5Test {
         solver.interpretString("1 2 3 0")
         solver.interpretString("-1 -2 0")
         solver.interpretString("-3 0")
-
         solver.solve()
-        assertEquals(false, solver.formula.canBeSolved)
+        assertEquals(true, solver.formula.canBeSolved)
+        assertEquals(true, solver.isAnswerCorrect())
+
     }
     @Test
     fun `test 6`() {
@@ -141,6 +143,20 @@ class HelloJunit5Test {
         assertEquals(true, solver.formula.isSolved)
         assertEquals(true, solver.isAnswerCorrect())
     }
+    @Test
+    fun `test 14`() {
+        val solver = Solver()
+        solver.interpretString("p cnf 9 7")
+        solver.interpretString("1 6 7 8 0")
+        solver.interpretString("2 0")
+        solver.interpretString("3 5 0")
+        solver.interpretString("4 0")
+        solver.interpretString("9 0")
+        solver.interpretString("-2 -3 0")
+        solver.interpretString("-2 -4 0")
+        solver.solve()
+        assertEquals(false, solver.formula.canBeSolved)
+    }
 
     @Test
     fun `test 238`() {
@@ -150,6 +166,5 @@ class HelloJunit5Test {
         solver.solve()
         assertEquals(true, solver.formula.isSolved)
     }
-//    - тест перебора вариантов, которого нет пока
 }
 

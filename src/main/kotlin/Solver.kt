@@ -6,14 +6,15 @@ class Solver {
     var formula: BooleanFormula = BooleanFormula()
     var needResolution = true
     fun solve() {
+//        formula.printState()
         firstIterationOfResolution()
+//        formula.printState()
         if (formula.lastLevel.isEmpty()) needResolution = false
         while (!formula.isSolved && formula.canBeSolved) {
             if (formula.unknownVariablesLeft == 0 || formula.isEmpty()) formula.isSolved = true
             if (needResolution)
                 iterationOfResolution()
             else bruteForce(formula)
-//            formula.printState()
             if (formula.lastLevel.isEmpty()) needResolution = false
         }
         if (!formula.canBeSolved) {
@@ -25,7 +26,6 @@ class Solver {
                     println((i+1).toString() + ": " + formula.variables[i])
                 else println("${i+1}: true or false")
             }
-
             saveSolution()
         }
     }
@@ -40,21 +40,22 @@ class Solver {
                     formula.lastLevel.add(cl1.resolute(cl2))
             }
         }
-
         for (el in formula.lastLevel) {
             if (el.isEmpty()) {
                 formula.canBeSolved = false
+                formula.emptyClause = el
                 return
             }
             if (el.isLiteral()) {
                 formula.deleteAllUsesOfVariable(abs(el.varArray[0]), el.varArray[0] > 0, formula.lastLevel)
                 formula.deleteAllUsesOfVariable(abs(el.varArray[0]), el.varArray[0] > 0, formula.clauses)
-
             }
         }
     }
 
     private fun iterationOfResolution() {
+        println("new iteration")
+        println(formula.unknownVariablesLeft)
         formula.newLastLevel = mutableListOf<Clause>()
         val llSize = formula.lastLevel.size
         if (llSize >= 2) {
@@ -93,6 +94,7 @@ class Solver {
     }
 
     private fun bruteForce(formula: BooleanFormula) {
+        println("bf started")
         if (formula.isSolved) {
             this.formula = formula
             return
@@ -155,7 +157,8 @@ class Solver {
             array.remove(0);
             val newClause = Clause(array)
             formula.startClauses.add(newClause.copy())
-            formula.addClause(newClause)
+//            formula.addClause(newClause)
+            formula.addClauseFromFile(newClause)
         }
     }
 }
