@@ -46,7 +46,7 @@ class Clause(array: MutableList<Int>, val parent1: Clause? = null, val parent2: 
         return Clause(arr, this, clause)
     }
 
-    fun simplify() {
+    private fun simplify() {
         for (el in varArray) {
             if (-el in varArray) {
                 varArray = mutableListOf()

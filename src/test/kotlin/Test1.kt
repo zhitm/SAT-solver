@@ -10,8 +10,6 @@ class HelloJunit5Test {
         solver.interpretString("-1 3 0")
         solver.interpretString("1 -2 0")
         solver.solve()
-        for (el in solver.formula.variables) println(el)
-        println()
         assertEquals(true, solver.formula.isSolved)
         assertEquals(true, solver.isAnswerCorrect())
     }
@@ -84,10 +82,17 @@ class HelloJunit5Test {
         solver.interpretString("2 0")
         solver.interpretString("3 0")
         solver.solve()
-        for (el in solver.formula.variables) println(el)
-        println()
         assertEquals(true, solver.formula.isSolved)
         assertEquals(true, solver.isAnswerCorrect())
+    }
+    @Test
+    fun `test 9`() {
+        val solver = Solver()
+        solver.interpretString("p cnf 1 2")
+        solver.interpretString("1 0")
+        solver.interpretString("-1 0")
+        solver.solve()
+        assertEquals(false, solver.formula.canBeSolved)
     }
 //    @Test
 //    fun `test 238`() {

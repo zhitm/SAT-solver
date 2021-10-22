@@ -100,13 +100,14 @@ class BooleanFormula() {
     }
 
     fun deleteAllUsesOfVariable(variable: Int, value: Boolean, list: MutableList<Clause>) {
-        if (variables[variable - 1] == null)
+        if (variables[variable - 1] == null) {
             unknownVariablesLeft--
-        variables[variable - 1] = value
-
+            variables[variable - 1] = value
+        }
+        val valueOfVariable : Boolean = variables[variable-1] == true
         when (list) {
             clauses -> clauses =
-                list.filter { deleteClauseOrDeleteVariable(variable, value, it, list) } as MutableList<Clause>
+                list.filter { deleteClauseOrDeleteVariable(variable, valueOfVariable, it, list) } as MutableList<Clause>
             lastLevel -> lastLevel =
                 list.filter { deleteClauseOrDeleteVariable(variable, value, it, list) } as MutableList<Clause>
             newLastLevel -> newLastLevel =

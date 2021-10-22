@@ -16,8 +16,17 @@ class Solver {
 //            formula.printState()
             if (formula.lastLevel.isEmpty()) needResolution = false
         }
-        if (!formula.canBeSolved) createGraph(formula.emptyClause)
-        else {
+        if (!formula.canBeSolved) {
+            println("No solution!")
+            createGraph(formula.emptyClause)
+        } else {
+            println(formula.isSolved)
+            for (i in formula.variables.indices) {
+                if (formula.variables[i] != null)
+                    println((i+1).toString() + ": " + formula.variables[i])
+                else println("${i+1}: true or false")
+            }
+
             saveSolution()
         }
     }
@@ -84,13 +93,13 @@ class Solver {
         formula.lastLevel = formula.newLastLevel
     }
 
-    private fun bruteForce(formula: BooleanFormula){
+    private fun bruteForce(formula: BooleanFormula) {
         if (formula.isSolved) {
-            this.formula=formula
+            this.formula = formula
             return
         }
         if (!formula.canBeSolved) return
-        for (el in formula.variables){
+        for (el in formula.variables) {
             if (el == null) {
 //                TODO("все")
             }
