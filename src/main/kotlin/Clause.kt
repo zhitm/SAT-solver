@@ -1,12 +1,13 @@
+import com.sun.org.apache.xpath.internal.operations.Variable
 import kotlin.math.abs
 
 class Clause(array: MutableList<Int>, val parent1: Clause? = null, val parent2: Clause? = null) {
     var varArray = array
     var length = array.size
-
+    var value = false
     init {
-        varArray.sortBy { abs(it) }
         simplify()
+        varArray.sortBy { abs(it) }
     }
 
     fun isEmpty(): Boolean {
@@ -21,53 +22,33 @@ class Clause(array: MutableList<Int>, val parent1: Clause? = null, val parent2: 
         return Clause(varArray.toMutableList())
     }
 
-    fun canBeResolute(clause: Clause): Boolean {
-        if (clause.length == length && length > 1) {
-//            полностью противоположные клозы не резолируются
-            var areOpposite = true
-            for (i in varArray.indices) {
-                if (clause.varArray[i] != -varArray[i]) {
-                    areOpposite = false
-                    break
-                }
-                if (areOpposite) return false
-            }
-        }
-        for (el in varArray) {
-            if (-el in clause.varArray)
-                return true
-        }
-        for (el in clause.varArray) {
-            if (-el in varArray)
-                return true
-        }
-        return false
+    fun canBeResolute(clause: Clause, variable: Int): Boolean {
+        return (-variable in clause.varArray)
     }
 
-    fun resolute(clause: Clause): Clause {
+    fun resolute(clause: Clause, variable: Int): Clause {
         val arr: MutableList<Int> = mutableListOf()
         for (el in varArray) {
-            if (-el !in clause.varArray && el !in arr)
-                arr.add(el)
+            if (el != variable && el !in arr) arr.add(el)
         }
         for (el in clause.varArray) {
-            if (-el !in varArray && el !in arr)
-                arr.add(el)
+            if (-el != variable && el !in arr) arr.add(el)
         }
         return Clause(arr, this, clause)
     }
 
-    private fun simplify() {
+    fun simplify() {
         for (el in varArray) {
             if (-el in varArray) {
-                varArray = mutableListOf()
-                length = 0
-                return
+                value = true
             }
-            for (i in 1 until varArray.count { it == el }) {
-                varArray.remove(el)
-                length--
-            }
+//            for (i in 1 until varArray.count { it == el }) {
+//                varArray.remove(el)
+//                length--
+//            }
+
         }
+//        val set: Set<Int> = varArray.toSet()
+//        varArray = set.toMutableList()
     }
 }

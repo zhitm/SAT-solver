@@ -1,4 +1,3 @@
-c no solution
 p cnf 20 91
 4 -18 19 0
 3 18 -5 0

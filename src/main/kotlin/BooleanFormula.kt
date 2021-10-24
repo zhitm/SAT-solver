@@ -1,4 +1,5 @@
 import kotlin.math.abs
+import kotlin.system.measureTimeMillis
 
 class BooleanFormula() {
     var startClauses: MutableList<Clause> = mutableListOf()
@@ -26,12 +27,12 @@ class BooleanFormula() {
 
     fun addClauseFromFile(clause: Clause) {
         for (literal in clause.varArray) {
-            if (literal > 0 && (variables[literal - 1] == true)|| (literal < 0 && variables[-literal - 1] == false )) return
+            if (literal > 0 && (variables[literal - 1] == true) || (literal < 0 && variables[-literal - 1] == false)) return
         }
-        for (i in variables.indices){
-            if (variables[i]!=null) {
-                if ((i+1) in clause.varArray && variables[i]==false) clause.varArray.remove(i+1)
-                if ((-i-1) in clause.varArray && variables[i]==true) clause.varArray.remove(-i-1)
+        for (i in variables.indices) {
+            if (variables[i] != null) {
+                if ((i + 1) in clause.varArray && variables[i] == false) clause.varArray.remove(i + 1)
+                if ((-i - 1) in clause.varArray && variables[i] == true) clause.varArray.remove(-i - 1)
             }
         }
         clause.length = clause.varArray.size
@@ -50,16 +51,26 @@ class BooleanFormula() {
     }
 
     fun addClause(clause: Clause) {
-        if (!hasClause(clause)) {
-            clauses.add(clause)
-            clauseCnt++
-        }
+        clauses.add(clause)
+        clauseCnt++
+
     }
 
-    private fun hasClause(clause: Clause): Boolean {
+    fun hasClause(clause: Clause): Boolean {
         for (cl in clauses) {
-            if (cl.varArray == clause.varArray) return true
+            if (cl.varArray.toSet() == clause.varArray.toSet()) return true
         }
+        return false
+    }
+
+    fun hasClauseAtNewLevels(clause: Clause): Boolean {
+            for (cl in lastLevel) {
+                if (cl.varArray.toSet() == clause.varArray.toSet()) return true
+            }
+            for (cl in lastLevel) {
+                if (cl.varArray.toSet() == clause.varArray.toSet()) return true
+            }
+
         return false
     }
 

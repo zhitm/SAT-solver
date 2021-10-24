@@ -1,33 +1,32 @@
 import java.io.File
 import java.io.BufferedReader
-import java.lang.Math.abs
 
 class Solver {
     var formula: BooleanFormula = BooleanFormula()
     var needResolution = true
+
     fun solve() {
-//        formula.printState()
-        firstIterationOfResolution()
-//        formula.printState()
-        if (formula.lastLevel.isEmpty()) needResolution = false
-        while (!formula.isSolved && formula.canBeSolved) {
-            if (formula.unknownVariablesLeft == 0 || formula.isEmpty()) formula.isSolved = true
+        while (formula.canBeSolved && needResolution) {
             if (needResolution)
-                iterationOfResolution()
-            else bruteForce(formula)
+                resolute()
             if (formula.lastLevel.isEmpty()) needResolution = false
         }
         if (!formula.canBeSolved) {
             println("No solution!")
-            createGraph(formula.emptyClause)
+            createGraph()
         } else {
+            bruteForce(formula)
             for (i in formula.variables.indices) {
                 if (formula.variables[i] != null)
-                    println((i+1).toString() + ": " + formula.variables[i])
-                else println("${i+1}: true or false")
+                    println((i + 1).toString() + ": " + formula.variables[i])
+                else println("${i + 1}: true or false")
             }
-            saveSolution()
         }
+    }
+
+    private fun resolute() {
+        if (formula.lastLevel.isEmpty()) firstIterationOfResolution()
+        else iterationOfResolution()
     }
 
     private fun firstIterationOfResolution() {
@@ -36,8 +35,14 @@ class Solver {
             for (j in 0 until i) {
                 val cl1 = formula.clauses[i]
                 val cl2 = formula.clauses[j]
-                if (cl1.canBeResolute(cl2))
-                    formula.lastLevel.add(cl1.resolute(cl2))
+                for (variable in cl1.varArray) {
+                    if (cl1.canBeResolute(cl2, variable)) {
+                        val newClause = cl1.resolute(cl2, variable)
+                        if (newClause.isEmpty()) formula.emptyClause = newClause
+                        if (!formula.hasClause(newClause) && !newClause.value)
+                            formula.lastLevel.add(newClause)
+                    }
+                }
             }
         }
         for (el in formula.lastLevel) {
@@ -46,50 +51,68 @@ class Solver {
                 formula.emptyClause = el
                 return
             }
-            if (el.isLiteral()) {
-                formula.deleteAllUsesOfVariable(abs(el.varArray[0]), el.varArray[0] > 0, formula.lastLevel)
-                formula.deleteAllUsesOfVariable(abs(el.varArray[0]), el.varArray[0] > 0, formula.clauses)
-            }
         }
     }
 
     private fun iterationOfResolution() {
         println("new iteration")
-        println(formula.unknownVariablesLeft)
         formula.newLastLevel = mutableListOf<Clause>()
+//        formula.printState()
         val llSize = formula.lastLevel.size
         if (llSize >= 2) {
             for (i in 1 until llSize) {
                 for (j in 0 until i) {
                     val cl1 = formula.lastLevel[i]
                     val cl2 = formula.lastLevel[j]
-                    if (cl1.canBeResolute(cl2))
-                        formula.newLastLevel.add(cl1.resolute(cl2))
+                    for (variable in cl1.varArray)
+                        if (cl1.canBeResolute(cl2, variable)) {
+                            val newClause = cl1.resolute(cl2, variable)
+                            if (newClause.isEmpty()) formula.emptyClause = newClause
+
+                            if (!newClause.value && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(
+                                    newClause
+                                )
+                            )
+                                formula.newLastLevel.add(newClause)
+                        }
                 }
                 for (el in formula.clauses) {
                     val cl1 = formula.lastLevel[i]
-                    if (cl1.canBeResolute(el))
-                        formula.newLastLevel.add(cl1.resolute(el))
+                    for (variable in cl1.varArray)
+                        if (cl1.canBeResolute(el, variable)) {
+                            val newClause = cl1.resolute(el, variable)
+                            if (newClause.isEmpty()) formula.emptyClause = newClause
+
+                            if (!newClause.value && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(
+                                    newClause
+                                )
+                            )
+                                formula.newLastLevel.add(newClause)
+                        }
                 }
             }
         }
         for (el in formula.clauses) {
             val cl1 = formula.lastLevel[0]
-            if (cl1.canBeResolute(el))
-                formula.newLastLevel.add(cl1.resolute(el))
+            for (variable in cl1.varArray)
+                if (cl1.canBeResolute(el, variable)) {
+                    val newClause = cl1.resolute(el, variable)
+                    if (newClause.isEmpty()) formula.emptyClause = newClause
+
+                    if (!newClause.value && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(newClause))
+                        formula.newLastLevel.add(newClause)
+                }
         }
         for (el in formula.newLastLevel) {
             if (el.isEmpty()) {
                 formula.canBeSolved = false
                 return
             }
-            if (el.isLiteral()) {
-                formula.deleteAllUsesOfVariable(abs(el.varArray[0]), el.varArray[0] > 0, formula.newLastLevel)
-                formula.deleteAllUsesOfVariable(abs(el.varArray[0]), el.varArray[0] > 0, formula.lastLevel)
-                formula.deleteAllUsesOfVariable(abs(el.varArray[0]), el.varArray[0] > 0, formula.clauses)
-            }
         }
-        for (el in formula.lastLevel) formula.addClause(el)
+        for (el in formula.lastLevel) {
+            if (!el.value && !formula.hasClause(el))
+                formula.addClause(el)
+        }
         formula.lastLevel = formula.newLastLevel
     }
 
@@ -104,8 +127,8 @@ class Solver {
             if (formula.variables[i] == null) {
                 val formulaWithTrueValue: BooleanFormula = formula.copy()
                 val formulaWithFalseValue: BooleanFormula = formula.copy()
-                formulaWithTrueValue.setVariable(i+1, true)
-                formulaWithFalseValue.setVariable(i+1, false)
+                formulaWithTrueValue.setVariable(i + 1, true)
+                formulaWithFalseValue.setVariable(i + 1, false)
                 bruteForce(formulaWithTrueValue)
                 bruteForce(formulaWithFalseValue)
             }
@@ -121,8 +144,23 @@ class Solver {
 //        TODO("обработать ошибки ввода + пользоваться 0 в конце строки")
     }
 
-    private fun createGraph(emptyClause: Clause?) {
-//        TODO("")
+    private fun createGraph() {
+        val graph = Graph()
+        fillGraph(graph, formula.emptyClause!!)
+        graph.createGraphvizFile()
+    }
+
+    private fun fillGraph(graph: Graph, clause: Clause) {
+        val current = graph.getNode(clause)
+        if (clause.parent1 != null && clause.parent2 != null) {
+            current.addChild(Node(clause.parent1))
+            current.addChild(Node(clause.parent2))
+            graph.addEdge(current, current.child1!!)
+            graph.addEdge(current, current.child2!!)
+            fillGraph(graph, clause.parent1)
+            fillGraph(graph, clause.parent2)
+        }
+
     }
 
     private fun saveSolution() {}
