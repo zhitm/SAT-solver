@@ -187,7 +187,6 @@ class HelloJunit5Test {
         solver.interpretString("-3 -4 0")
         solver.solve()
         assertEquals(true, solver.formula.canBeSolved)
-
         assertEquals(true, solver.formula.isSolved)
         assertEquals(true, solver.formula.isAnswerCorrect())
     }
@@ -204,7 +203,7 @@ class HelloJunit5Test {
         assertEquals(true, solver.formula.isAnswerCorrect())
     }
     @Test
-    fun `test 18`() {
+    fun `test 17`() {
         val solver = Solver()
         solver.interpretString("p cnf 2 4")
         solver.interpretString("1 2 0")
@@ -217,7 +216,7 @@ class HelloJunit5Test {
     }
 
     @Test
-    fun `test 19`() {
+    fun `test 18`() {
         val solver = Solver()
         solver.interpretString("p cnf 2 1")
         solver.interpretString("-1 -2 0")
@@ -227,10 +226,11 @@ class HelloJunit5Test {
         assertEquals(true, solver.formula.isAnswerCorrect())
     }
     @Test
-    fun `test 20`() {
+    fun `test 19`() {
         val solver = Solver()
-        solver.interpretString("p cnf 4 1")
+        solver.interpretString("p cnf 5 2")
         solver.interpretString("1 2 3 4 0")
+        solver.interpretString("5 0")
         solver.solve()
         assertEquals(true, solver.formula.canBeSolved)
         assertEquals(true, solver.formula.isSolved)
