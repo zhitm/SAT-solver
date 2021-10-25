@@ -16,12 +16,11 @@ class Graph() {
         return Node(clause)
     }
     fun createGraphvizFile(){
-        File("src/main/kotlin/somefile.dot").printWriter().use { out -> out.println("digraph G {")
+        File("src/main/dot/somefile.dot").printWriter().use { out -> out.println("digraph G {")
             edges.forEach {
-                out.println("${it.first.myId} -> ${it.second.myId};")
+                out.println("${it.second.myId} -> ${it.first.myId};")
             }
             nodes.forEach{ out.println("${it.myId} [label=\"${it.value}\"] ")}
             out.println("}")
         }
-    }
-}
+    }}

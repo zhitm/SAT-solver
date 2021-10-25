@@ -1,6 +1,10 @@
-fun main(args: Array<String>) {
-    val solver: Solver = Solver()
+import kotlin.system.measureTimeMillis
 
-    solver.readFormulaFromFile("src/main/kotlin/test.txt")
-    solver.solve()
+fun main(args: Array<String>) {
+    val time = measureTimeMillis {
+        val solver: Solver = Solver()
+        solver.readFormulaFromFile("src/main/cnf_examples/test7.txt")
+        solver.solve()
+    }
+    println("Time to solve in seconds: ${time/1000}")
 }

@@ -3,7 +3,7 @@ class Node(clause: Clause, var child1: Node? = null, var child2: Node? = null) {
 
 
 
-    val value = if (!clause.isEmpty()) clause.varArray.joinToString(" ") else "Empty clause"
+    val value = if (!clause.isEmpty()) clause.varArray.joinToString(" ") else "□"
 
     fun addChild(node: Node) {
 
