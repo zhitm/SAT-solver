@@ -1,7 +1,7 @@
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class HelloJunit5Test {
+class Test1 {
     @Test
     fun `test 1`() {
         val solver = Solver()
@@ -60,7 +60,6 @@ class HelloJunit5Test {
         assertEquals(true, solver.formula.isSolved)
         assertEquals(true, solver.formula.canBeSolved)
         assertEquals(true, solver.formula.isAnswerCorrect())
-
     }
 
     @Test
@@ -212,7 +211,6 @@ class HelloJunit5Test {
         solver.interpretString("-1 2 0")
         solver.solve()
         assertEquals(false, solver.formula.canBeSolved)
-
     }
 
     @Test
@@ -237,4 +235,3 @@ class HelloJunit5Test {
         assertEquals(true, solver.formula.isAnswerCorrect())
     }
 }
-
