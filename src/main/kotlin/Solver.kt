@@ -1,5 +1,5 @@
-import java.io.File
 import java.io.BufferedReader
+import java.io.File
 
 class Solver {
     var formula: BooleanFormula = BooleanFormula()
@@ -103,13 +103,12 @@ class Solver {
         if (lhs.isResolutionPossible(rhs, variable)) {
             val newClause = lhs.resolute(rhs, variable)
             if (newClause.isEmpty()) formula.emptyClause = newClause
-            if (!newClause.hasProposalLiterals
-                && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(newClause)
+            if (!newClause.hasProposalLiterals &&
+                !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(newClause)
             )
                 formula.newLastLevel.add(newClause)
         }
     }
-
 
     private fun bruteForce(formula: BooleanFormula) {
         if (formula.unknownVariablesLeft == 0 && formula.isAnswerCorrect()) {
@@ -139,7 +138,6 @@ class Solver {
         for (string in inputStrings) {
             interpretString(string)
         }
-//        TODO("обработать ошибки ввода + пользоваться 0 в конце строки")
     }
 
     private fun createGraph() {
@@ -158,7 +156,6 @@ class Solver {
             fillGraph(graph, clause.parent1)
             fillGraph(graph, clause.parent2)
         }
-
     }
 
     fun interpretString(string: String) {

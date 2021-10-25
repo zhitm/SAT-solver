@@ -1,4 +1,4 @@
-import java.util.*
+import java.util.* // ktlint-disable no-wildcard-imports
 import kotlin.math.abs
 
 class BooleanFormula {
@@ -21,10 +21,6 @@ class BooleanFormula {
         unknownVariablesLeft = varCnt
     }
 
-    fun isEmpty(): Boolean {
-        return (clauses.isEmpty())
-    }
-
     fun addClause(clause: Clause) {
         clauses.add(clause)
         clauseCnt++
@@ -45,18 +41,6 @@ class BooleanFormula {
             if (cl.varArray.toSet() == clause.varArray.toSet()) return true
         }
         return false
-    }
-
-    fun printState() {
-        println(".....")
-        for (el in startClauses) print(el.varArray)
-        println()
-        for (el in clauses) print(el.varArray)
-        println()
-        for (el in lastLevel) print(el.varArray)
-        println()
-        for (el in newLastLevel) print(el.varArray)
-        println()
     }
 
     private fun deleteClauseOrDeleteVariable(variable: Int, value: Boolean, clause: Clause): Boolean {
@@ -152,4 +136,3 @@ class BooleanFormula {
         return true
     }
 }
-
