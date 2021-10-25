@@ -21,7 +21,7 @@ class Clause(array: MutableList<Int>, val parent1: Clause? = null, val parent2: 
         return Clause(varArray.toMutableList())
     }
 
-    fun canBeResolute(clause: Clause, variable: Int): Boolean {
+    fun isResolutionPossible(clause: Clause, variable: Int): Boolean {
         return (-variable in clause.varArray)
     }
 

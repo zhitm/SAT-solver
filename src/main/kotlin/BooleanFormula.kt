@@ -1,23 +1,23 @@
 import java.util.*
 import kotlin.math.abs
 
-class BooleanFormula() {
+class BooleanFormula {
     var startClauses: MutableList<Clause> = mutableListOf()
     var varCnt: Int = 0
     var clauseCnt: Int = 0
     var variables = arrayOfNulls<Boolean>(varCnt)
     var canBeSolved = true
     var isSolved = false
-    var unknownVariablesLeft = varCnt;
+    var unknownVariablesLeft = varCnt
     var clauses: MutableList<Clause> = mutableListOf()
     var emptyClause: Clause? = null
     var lastLevel: MutableList<Clause> = mutableListOf()
     var newLastLevel: MutableList<Clause> = mutableListOf()
-    val stackOfKnownLiterals: Stack<Int> = Stack()
+    private val stackOfKnownLiterals: Stack<Int> = Stack()
 
     fun setVarsCnt(cnt: Int) {
         varCnt = cnt
-        variables = arrayOfNulls<Boolean>(varCnt)
+        variables = arrayOfNulls(varCnt)
         unknownVariablesLeft = varCnt
     }
 
@@ -68,9 +68,7 @@ class BooleanFormula() {
                 clause.varArray.remove(variable)
                 clause.length--
                 if (clause.isEmpty()) {
-                    emptyClause = clause
-                    clauseCnt--
-                    canBeSolved = false
+                    markFormulaAsSolved(clause)
                     return false
                 }
             }
@@ -79,9 +77,7 @@ class BooleanFormula() {
                 clause.varArray.remove(-variable)
                 clause.length--
                 if (clause.isEmpty()) {
-                    emptyClause = clause
-                    clauseCnt--
-                    canBeSolved = false
+                    markFormulaAsSolved(clause)
                     return false
                 }
             } else {
@@ -90,6 +86,12 @@ class BooleanFormula() {
             }
         }
         return true
+    }
+
+    private fun markFormulaAsSolved(emptyClause: Clause) {
+        this.emptyClause = emptyClause
+        clauseCnt--
+        canBeSolved = false
     }
 
     fun copy(): BooleanFormula {
@@ -111,12 +113,12 @@ class BooleanFormula() {
         }
     }
 
-    fun deleteAllUsesOfVariable(variable: Int) {
+    private fun deleteAllUsesOfVariable(variable: Int) {
         val valueOfVariable: Boolean = variables[variable - 1] == true
         clauses = clauses.filter { deleteClauseOrDeleteVariable(variable, valueOfVariable, it) } as MutableList<Clause>
     }
 
-    fun simplify() {
+    fun simplifyAndFindSomeVariables() {
         clauses.filter { !it.hasProposalLiterals }
         clauseCnt = clauses.size
         do {
@@ -129,21 +131,16 @@ class BooleanFormula() {
                     val literal = el.varArray[0]
                     val value = literal > 0
                     setVariable(abs(literal), value)
-//                    stackOfKnownLiterals.push(abs(literal))
                 }
             }
-//            if (unknownVariablesLeft == 0 || isEmpty()) {
-//                return
-//            }
         } while (!stackOfKnownLiterals.empty())
     }
 
-
     private fun isClausePositive(clause: Clause): Boolean {
-        if (variables.all { it == null}) return false
-        for (el in clause.varArray) {
-            if (el > 0 && variables[el - 1] == true) return true
-            if (el < 0 && variables[-el - 1] == false) return true
+        if (variables.all { it == null }) return false
+        for (literal in clause.varArray) {
+            if (literal > 0 && variables[literal - 1] == true) return true
+            if (literal < 0 && variables[-literal - 1] == false) return true
         }
         return false
     }
@@ -154,6 +151,5 @@ class BooleanFormula() {
         }
         return true
     }
-
 }
 
