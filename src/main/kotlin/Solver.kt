@@ -42,7 +42,7 @@ class Solver {
                     if (cl1.canBeResolute(cl2, variable)) {
                         val newClause = cl1.resolute(cl2, variable)
                         if (newClause.isEmpty()) formula.emptyClause = newClause
-                        if (!formula.hasClause(newClause) && !newClause.value)
+                        if (!formula.hasClause(newClause) && !newClause.hasProposalLiterals)
                             formula.lastLevel.add(newClause)
                     }
                 }
@@ -70,7 +70,7 @@ class Solver {
                             val newClause = cl1.resolute(cl2, variable)
                             if (newClause.isEmpty()) formula.emptyClause = newClause
 
-                            if (!newClause.value && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(
+                            if (!newClause.hasProposalLiterals && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(
                                     newClause
                                 )
                             )
@@ -84,7 +84,7 @@ class Solver {
                             val newClause = cl1.resolute(el, variable)
                             if (newClause.isEmpty()) formula.emptyClause = newClause
 
-                            if (!newClause.value && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(
+                            if (!newClause.hasProposalLiterals && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(
                                     newClause
                                 )
                             )
@@ -100,7 +100,7 @@ class Solver {
                     val newClause = cl1.resolute(el, variable)
                     if (newClause.isEmpty()) formula.emptyClause = newClause
 
-                    if (!newClause.value && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(newClause))
+                    if (!newClause.hasProposalLiterals && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(newClause))
                         formula.newLastLevel.add(newClause)
                 }
         }
@@ -111,7 +111,7 @@ class Solver {
             }
         }
         for (el in formula.lastLevel) {
-            if (!el.value && !formula.hasClause(el))
+            if (!el.hasProposalLiterals && !formula.hasClause(el))
                 formula.addClause(el)
         }
         formula.lastLevel = formula.newLastLevel

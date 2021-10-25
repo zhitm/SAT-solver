@@ -117,7 +117,7 @@ class BooleanFormula() {
     }
 
     fun simplify() {
-        clauses.filter { !it.value }
+        clauses.filter { !it.hasProposalLiterals }
         clauseCnt = clauses.size
         do {
             while (!stackOfKnownLiterals.empty()) {

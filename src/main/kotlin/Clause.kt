@@ -1,12 +1,11 @@
-import com.sun.org.apache.xpath.internal.operations.Variable
 import kotlin.math.abs
 
 class Clause(array: MutableList<Int>, val parent1: Clause? = null, val parent2: Clause? = null) {
     var varArray = array
     var length = array.size
-    var value = false
+    var hasProposalLiterals = false
     init {
-        simplify()
+        checkForProposalLiterals()
         varArray.sortBy { abs(it) }
     }
 
@@ -37,18 +36,11 @@ class Clause(array: MutableList<Int>, val parent1: Clause? = null, val parent2: 
         return Clause(arr, this, clause)
     }
 
-    fun simplify() {
+    private fun checkForProposalLiterals() {
         for (el in varArray) {
             if (-el in varArray) {
-                value = true
+                hasProposalLiterals = true
             }
-//            for (i in 1 until varArray.count { it == el }) {
-//                varArray.remove(el)
-//                length--
-//            }
-
         }
-//        val set: Set<Int> = varArray.toSet()
-//        varArray = set.toMutableList()
     }
 }
