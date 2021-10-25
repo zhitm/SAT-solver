@@ -28,4 +28,3 @@ tasks.withType<KotlinCompile> {
 application {
     mainClass.set("MainKt")
 }
-
