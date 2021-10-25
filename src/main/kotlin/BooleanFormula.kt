@@ -3,7 +3,7 @@ import kotlin.math.abs
 
 class BooleanFormula {
     var startClauses: MutableList<Clause> = mutableListOf()
-    var varCnt: Int = 0
+    private var varCnt: Int = 0
     var clauseCnt: Int = 0
     var variables = arrayOfNulls<Boolean>(varCnt)
     var canBeSolved = true

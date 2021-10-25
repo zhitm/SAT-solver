@@ -3,7 +3,7 @@ import java.io.BufferedReader
 
 class Solver {
     var formula: BooleanFormula = BooleanFormula()
-    var needResolution = true
+    private var needResolution = true
 
     fun solve() {
         while (formula.canBeSolved && needResolution) {
@@ -12,12 +12,19 @@ class Solver {
             if (formula.lastLevel.isEmpty()) needResolution = false
         }
         if (!formula.canBeSolved) {
-            println("No solution!")
             createGraph()
         } else {
             formula.simplifyAndFindSomeVariables()
             if (!formula.isSolved)
                 bruteForce(formula)
+        }
+    }
+
+    fun printResult() {
+        if (!formula.canBeSolved) {
+            println("No solution!")
+            createGraph()
+        } else {
             for (i in formula.variables.indices) {
                 if (formula.variables[i] != null)
                     println((i + 1).toString() + ": " + formula.variables[i])
@@ -97,7 +104,8 @@ class Solver {
             val newClause = lhs.resolute(rhs, variable)
             if (newClause.isEmpty()) formula.emptyClause = newClause
             if (!newClause.hasProposalLiterals
-                && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(newClause))
+                && !formula.hasClauseAtNewLevels(newClause) && !formula.hasClause(newClause)
+            )
                 formula.newLastLevel.add(newClause)
         }
     }
@@ -161,7 +169,7 @@ class Solver {
             formula.setVarsCnt(varCnt)
         } else if (inputArray[0] != "c") {
             val array: MutableList<Int> = inputArray.map { it.toInt() } as MutableList<Int>
-            array.remove(0);
+            array.remove(0)
             val newClause = Clause(array)
             formula.startClauses.add(newClause.copy())
             formula.addClause(newClause)

@@ -4,6 +4,7 @@ class Clause(array: MutableList<Int>, val parent1: Clause? = null, val parent2: 
     var varArray = array
     var length = array.size
     var hasProposalLiterals = false
+
     init {
         checkForProposalLiterals()
         varArray.sortBy { abs(it) }

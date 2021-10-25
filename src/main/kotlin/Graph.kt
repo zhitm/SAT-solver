@@ -1,8 +1,8 @@
 import java.io.File
 
-class Graph() {
+class Graph {
     private val nodes = mutableListOf<Node>()
-    private val edges = mutableListOf<Pair<Node,Node>>()
+    private val edges = mutableListOf<Pair<Node, Node>>()
 
     fun addEdge(first: Node, second: Node) {
         if (first !in nodes) nodes.add(first)
@@ -10,19 +10,21 @@ class Graph() {
         edges.add(Pair(first, second))
     }
 
-    fun getNode(clause: Clause):Node{
+    fun getNode(clause: Clause): Node {
         for (node in nodes) {
-            if (node.value==clause.varArray.joinToString(" ")) return node
+            if (node.value == clause.varArray.joinToString(" ")) return node
         }
         return Node(clause)
     }
 
-    fun createGraphvizFile(){
-        File("src/main/dot/somefile.dot").printWriter().use { out -> out.println("digraph G {")
+    fun createGraphvizFile() {
+        File("src/main/dot/way_to_empty_clause.dot").printWriter().use { out ->
+            out.println("digraph G {")
             edges.forEach {
                 out.println("${it.second.myId} -> ${it.first.myId};")
             }
-            nodes.forEach{ out.println("${it.myId} [label=\"${it.value}\"] ")}
+            nodes.forEach { out.println("${it.myId} [label=\"${it.value}\"] ") }
             out.println("}")
         }
-    }}
+    }
+}
