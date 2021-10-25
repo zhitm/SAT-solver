@@ -136,7 +136,7 @@ class HelloJunit5Test {
         solver.solve()
         assertEquals(true, solver.formula.canBeSolved)
         assertEquals(true, solver.formula.isSolved)
-//        assertEquals(true, solver.formula.isAnswerCorrect())
+        assertEquals(true, solver.formula.isAnswerCorrect())
     }
 
     @Test
