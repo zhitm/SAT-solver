@@ -15,7 +15,9 @@ class Solver {
             println("No solution!")
             createGraph()
         } else {
-            bruteForce(formula)
+            formula.simplify()
+            if (!formula.isSolved)
+                bruteForce(formula)
             for (i in formula.variables.indices) {
                 if (formula.variables[i] != null)
                     println((i + 1).toString() + ": " + formula.variables[i])
@@ -28,6 +30,7 @@ class Solver {
         if (formula.lastLevel.isEmpty()) firstIterationOfResolution()
         else iterationOfResolution()
     }
+
 
     private fun firstIterationOfResolution() {
         if (formula.clauseCnt <= 1) return
@@ -55,9 +58,7 @@ class Solver {
     }
 
     private fun iterationOfResolution() {
-        println("new iteration")
         formula.newLastLevel = mutableListOf<Clause>()
-//        formula.printState()
         val llSize = formula.lastLevel.size
         if (llSize >= 2) {
             for (i in 1 until llSize) {
@@ -117,18 +118,23 @@ class Solver {
     }
 
     private fun bruteForce(formula: BooleanFormula) {
-        println("bf started")
+        if (formula.unknownVariablesLeft == 0 && formula.isAnswerCorrect()) {
+            formula.isSolved = true
+        }
+
         if (formula.isSolved) {
             this.formula = formula
             return
         }
-        if (!formula.canBeSolved) return
         for (i in formula.variables.indices) {
             if (formula.variables[i] == null) {
                 val formulaWithTrueValue: BooleanFormula = formula.copy()
                 val formulaWithFalseValue: BooleanFormula = formula.copy()
                 formulaWithTrueValue.setVariable(i + 1, true)
                 formulaWithFalseValue.setVariable(i + 1, false)
+                formulaWithTrueValue.simplify()
+                formulaWithFalseValue.simplify()
+//                лаааааааааажааааааа
                 bruteForce(formulaWithTrueValue)
                 bruteForce(formulaWithFalseValue)
             }
@@ -169,20 +175,8 @@ class Solver {
         return formula.variables
     }
 
-    private fun isClausePositive(clause: Clause): Boolean {
-        for (el in clause.varArray) {
-            if (el > 0 && formula.variables[el - 1] == true) return true
-            if (el < 0 && formula.variables[-el - 1] == false) return true
-        }
-        return false
-    }
 
-    fun isAnswerCorrect(): Boolean {
-        for (clause in formula.startClauses) {
-            if (!isClausePositive(clause)) return false
-        }
-        return true
-    }
+
 
     fun interpretString(string: String) {
         if (string == " ") return
@@ -195,8 +189,8 @@ class Solver {
             array.remove(0);
             val newClause = Clause(array)
             formula.startClauses.add(newClause.copy())
-//            formula.addClause(newClause)
-            formula.addClauseFromFile(newClause)
+            formula.addClause(newClause)
+//            formula.addClauseFromFile(newClause)
         }
     }
 }

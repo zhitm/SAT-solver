@@ -1,5 +1,5 @@
+import java.util.*
 import kotlin.math.abs
-import kotlin.system.measureTimeMillis
 
 class BooleanFormula() {
     var startClauses: MutableList<Clause> = mutableListOf()
@@ -13,7 +13,7 @@ class BooleanFormula() {
     var emptyClause: Clause? = null
     var lastLevel: MutableList<Clause> = mutableListOf()
     var newLastLevel: MutableList<Clause> = mutableListOf()
-
+    val stackOfKnownLiterals: Stack<Int> = Stack()
 
     fun setVarsCnt(cnt: Int) {
         varCnt = cnt
@@ -22,38 +22,12 @@ class BooleanFormula() {
     }
 
     fun isEmpty(): Boolean {
-        return (clauses.isEmpty() && lastLevel.isEmpty() && newLastLevel.isEmpty())
-    }
-
-    fun addClauseFromFile(clause: Clause) {
-        for (literal in clause.varArray) {
-            if (literal > 0 && (variables[literal - 1] == true) || (literal < 0 && variables[-literal - 1] == false)) return
-        }
-        for (i in variables.indices) {
-            if (variables[i] != null) {
-                if ((i + 1) in clause.varArray && variables[i] == false) clause.varArray.remove(i + 1)
-                if ((-i - 1) in clause.varArray && variables[i] == true) clause.varArray.remove(-i - 1)
-            }
-        }
-        clause.length = clause.varArray.size
-        if (clause.length == 0) {
-            canBeSolved = false
-            emptyClause = clause
-            return
-        }
-        addClause(clause)
-        if (clause.length == 1) {
-            val literal: Int = clause.varArray[0]
-            deleteAllUsesOfVariable(abs(literal), literal > 0, clauses)
-        }
-//        printState()
-
+        return (clauses.isEmpty())
     }
 
     fun addClause(clause: Clause) {
         clauses.add(clause)
         clauseCnt++
-
     }
 
     fun hasClause(clause: Clause): Boolean {
@@ -64,13 +38,12 @@ class BooleanFormula() {
     }
 
     fun hasClauseAtNewLevels(clause: Clause): Boolean {
-            for (cl in lastLevel) {
-                if (cl.varArray.toSet() == clause.varArray.toSet()) return true
-            }
-            for (cl in lastLevel) {
-                if (cl.varArray.toSet() == clause.varArray.toSet()) return true
-            }
-
+        for (cl in lastLevel) {
+            if (cl.varArray.toSet() == clause.varArray.toSet()) return true
+        }
+        for (cl in lastLevel) {
+            if (cl.varArray.toSet() == clause.varArray.toSet()) return true
+        }
         return false
     }
 
@@ -86,24 +59,17 @@ class BooleanFormula() {
         println()
     }
 
-    private fun deleteClauseOrDeleteVariable(
-        variable: Int,
-        value: Boolean,
-        clause: Clause,
-        list: MutableList<Clause>
-    ): Boolean {
+    private fun deleteClauseOrDeleteVariable(variable: Int, value: Boolean, clause: Clause): Boolean {
         if (variable in clause.varArray) {
             if (value) {
-                if (list == clauses)
-                    clauseCnt--
+                clauseCnt--
                 return false
             } else {
                 clause.varArray.remove(variable)
                 clause.length--
                 if (clause.isEmpty()) {
                     emptyClause = clause
-                    if (list == clauses)
-                        clauseCnt--
+                    clauseCnt--
                     canBeSolved = false
                     return false
                 }
@@ -114,14 +80,12 @@ class BooleanFormula() {
                 clause.length--
                 if (clause.isEmpty()) {
                     emptyClause = clause
-                    if (list == clauses)
-                        clauseCnt--
+                    clauseCnt--
                     canBeSolved = false
                     return false
                 }
             } else {
-                if (list == clauses)
-                    clauseCnt--
+                clauseCnt--
                 return false
             }
         }
@@ -130,9 +94,9 @@ class BooleanFormula() {
 
     fun copy(): BooleanFormula {
         val newFormula = BooleanFormula()
-        newFormula.variables = variables
+        newFormula.variables = variables.clone()
         newFormula.clauseCnt = clauseCnt
-        newFormula.clauses = clauses
+        newFormula.clauses = clauses.toMutableList()
         newFormula.startClauses = startClauses
         newFormula.unknownVariablesLeft = unknownVariablesLeft
         newFormula.varCnt = varCnt
@@ -140,34 +104,56 @@ class BooleanFormula() {
     }
 
     fun setVariable(variable: Int, value: Boolean) {
-        deleteAllUsesOfVariable(variable, value, clauses)
-    }
-
-    fun deleteAllUsesOfVariable(variable: Int, value: Boolean, list: MutableList<Clause>) {
         if (variables[variable - 1] == null) {
             unknownVariablesLeft--
             variables[variable - 1] = value
-        }
-        val valueOfVariable: Boolean = variables[variable - 1] == true
-        when (list) {
-            clauses -> clauses =
-                list.filter { deleteClauseOrDeleteVariable(variable, valueOfVariable, it, list) } as MutableList<Clause>
-            lastLevel -> lastLevel =
-                list.filter { deleteClauseOrDeleteVariable(variable, valueOfVariable, it, list) } as MutableList<Clause>
-            newLastLevel -> newLastLevel =
-                list.filter { deleteClauseOrDeleteVariable(variable, valueOfVariable, it, list) } as MutableList<Clause>
-        }
-        for (clause in list) {
-            if (!canBeSolved) return
-            if (unknownVariablesLeft == 0 || isEmpty()) {
-                isSolved = true
-                return
-            }
-            if (clause.isLiteral()) {
-                deleteAllUsesOfVariable(abs(clause.varArray[0]), clause.varArray[0] > 0, clauses)
-                deleteAllUsesOfVariable(abs(clause.varArray[0]), clause.varArray[0] > 0, lastLevel)
-                deleteAllUsesOfVariable(abs(clause.varArray[0]), clause.varArray[0] > 0, newLastLevel)
-            }
+            stackOfKnownLiterals.push(variable)
         }
     }
+
+    fun deleteAllUsesOfVariable(variable: Int) {
+        val valueOfVariable: Boolean = variables[variable - 1] == true
+        clauses = clauses.filter { deleteClauseOrDeleteVariable(variable, valueOfVariable, it) } as MutableList<Clause>
+    }
+
+    fun simplify() {
+        clauses.filter { !it.value }
+        clauseCnt = clauses.size
+        do {
+            while (!stackOfKnownLiterals.empty()) {
+                val literal = stackOfKnownLiterals.pop()
+                deleteAllUsesOfVariable(literal)
+            }
+            for (el in clauses) {
+                if (el.isLiteral()) {
+                    val literal = el.varArray[0]
+                    val value = literal > 0
+                    setVariable(abs(literal), value)
+//                    stackOfKnownLiterals.push(abs(literal))
+                }
+            }
+//            if (unknownVariablesLeft == 0 || isEmpty()) {
+//                return
+//            }
+        } while (!stackOfKnownLiterals.empty())
+    }
+
+
+    private fun isClausePositive(clause: Clause): Boolean {
+        if (variables.all { it == null}) return false
+        for (el in clause.varArray) {
+            if (el > 0 && variables[el - 1] == true) return true
+            if (el < 0 && variables[-el - 1] == false) return true
+        }
+        return false
+    }
+
+    fun isAnswerCorrect(): Boolean {
+        for (clause in startClauses) {
+            if (!isClausePositive(clause)) return false
+        }
+        return true
+    }
+
 }
+
