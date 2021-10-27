@@ -25,7 +25,10 @@ jobs:
         run: 
           ./gradlew run --args=src/main/cnf_examples/test.txt
 
-
       - name: Check by ktlint
         run: 
-          ./gradlew ktlintFormat
+          ./gradlew ktlintCheck
+
+      - name: Run tests
+        run:
+          ./gradlew test
