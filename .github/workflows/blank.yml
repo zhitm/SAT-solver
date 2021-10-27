@@ -23,7 +23,8 @@ jobs:
 
       - name: Build
         run: 
-          ./gradlew run       
+          ./gradlew run --args=src/main/cnf_examples/test.txt
+
 
       - name: Check by ktlint
         run: 
